@@ -4,7 +4,15 @@ import os
 from multiprocessing import Pool
 from decimal import Decimal
 
-CHUNK_SIZE = 5
+# Chunk size for multiprocessing
+# This value defines how many tasks are sent to each worker at a time
+# Large chunk sizees use less CPU resources but may not finish evenly
+# Small chunk sizes use more CPU resources but finish more evenly
+CHUNK_SIZE = 3
+# Split the runs into blocks to reduce memory usage
+# Larger block sizes use more memory but run faster
+# Smaller block sizes use less memory but taxe the CPU more
+BLOCK_SIZE = 10_000
 
 def get_pi_single(runs):
     inside_circle = 0
@@ -35,7 +43,7 @@ def get_inside_circle(runs):
     # pi_estimate = 4 * inside_circle / runs
     return inside_circle
 
-def get_inside_circle_blocked(runs, block_size=1_000_000):
+def get_inside_circle_blocked(runs, block_size = BLOCK_SIZE):
     inside_circle = 0
     for start in range(0, runs, block_size):
         size = min(block_size, runs - start)

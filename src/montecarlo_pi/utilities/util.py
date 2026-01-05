@@ -10,13 +10,24 @@ def get_decimal_precision(value):
         return len(value_str.split('.')[1])
     else:
         return 0
-    
-def get_decimal_difference(value1, value2, format_result=True):
+
+def get_accuracy(true_value, estimated_value):
     """
-    Returns the absolute difference between two Decimal values.
+    Gets accuracy between 2 numbers by counting matching decimal places.
     """
-    difference = Decimal(value1) - Decimal(value2)
-    if format_result:
-        return format(difference, 'f')
-    else:
-        return difference
+    true_value_decimal = Decimal(str(true_value))
+    estimated_value_decimal = Decimal(str(estimated_value))
+
+    true_value_decimals = str(true_value_decimal).split(".")[1] if "." in str(true_value_decimal) else ""
+    estimated_value_decimals = str(estimated_value_decimal).split(".")[1] if "." in str(estimated_value_decimal) else ""
+
+    decimal_accuracy = 0
+
+    if len(true_value_decimals) != 0 and len(estimated_value_decimals) != 0:
+        for true_decimal_digit, estimated_decimal_digit in zip(true_value_decimals, estimated_value_decimals):
+            if true_decimal_digit == estimated_decimal_digit:
+                decimal_accuracy += 1
+            else:
+                break
+
+    return decimal_accuracy

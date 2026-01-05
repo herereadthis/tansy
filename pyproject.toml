@@ -19,3 +19,13 @@ montecarlo-pi = "montecarlo_pi.cli:main"
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.0.2"
+
+[tool.pylint]
+max-line-length = 120
+
+[tool.pytest.ini_options]
+addopts = "-s"
+

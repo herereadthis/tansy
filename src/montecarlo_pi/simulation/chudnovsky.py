@@ -1,7 +1,11 @@
 """
 I did not make this.
 The Chudnovsky algorithm calculates pi to a high precision, efficiently.
-The following was taken from 
+
+The following was taken from:
+"Generating Values Of Pi To A Specified Number Of Decimal Places"
+by Joshua Salako
+https://archive.is/Rrmjv
 """
 
 # Import modules

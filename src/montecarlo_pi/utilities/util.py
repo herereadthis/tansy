@@ -1,3 +1,7 @@
+"""
+Utility functions
+"""
+
 from decimal import Decimal
 
 def get_decimal_precision(value):
@@ -8,8 +12,8 @@ def get_decimal_precision(value):
     value_str = format(value, 'f')
     if '.' in value_str:
         return len(value_str.split('.')[1])
-    else:
-        return 0
+
+    return 0
 
 def get_accuracy(true_value, estimated_value):
     """

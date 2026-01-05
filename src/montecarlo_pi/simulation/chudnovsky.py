@@ -23,18 +23,18 @@ def compute_pi(n):
     decimal.getcontext().prec = n + 3
     decimal.getcontext().Emax = 999999999
 
-    C = 426880 * decimal.Decimal(10005).sqrt()
-    K = decimal.Decimal(6)
-    M = decimal.Decimal(1)
-    X = decimal.Decimal(1)
-    L = decimal.Decimal(13591409)
-    S = L
+    chudnovsky_constant = 426880 * decimal.Decimal(10005).sqrt()
+    # K = decimal.Decimal(6)
+    multiplier_term = decimal.Decimal(1)
+    exponential_term = decimal.Decimal(1)
+    linear_sum = decimal.Decimal(13591409)
+    series_sum = linear_sum
 
     # For better precision, we calculate to n+3 and truncate the last two digits
     for i in range(1, n+3):
-        M = decimal.Decimal(M* ((1728*i*i*i)-(2592*i*i)+(1104*i)-120)/(i*i*i))
-        L = decimal.Decimal(545140134+L)
-        X = decimal.Decimal(-262537412640768000*X)
-        S += decimal.Decimal((M*L) / X)
+        multiplier_term = decimal.Decimal(multiplier_term* ((1728*i*i*i)-(2592*i*i)+(1104*i)-120)/(i*i*i))
+        linear_sum = decimal.Decimal(545140134+linear_sum)
+        exponential_term = decimal.Decimal(-262537412640768000*exponential_term)
+        series_sum += decimal.Decimal((multiplier_term*linear_sum) / exponential_term)
 
-    return str(C/S)[:-2] # Pi is C/S
+    return str(chudnovsky_constant/series_sum)[:-2] # Pi is C/series_sum

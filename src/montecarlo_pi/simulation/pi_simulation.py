@@ -1,8 +1,12 @@
+"""
+Simulate pi via Monte Carlo, with multiprocessing.
+"""
+
+from decimal import Decimal
+from multiprocessing import Pool
+import os
 import random
 import numpy as np
-import os
-from multiprocessing import Pool
-from decimal import Decimal
 
 # Chunk size for multiprocessing
 # This value defines how many tasks are sent to each worker at a time
@@ -15,6 +19,9 @@ CHUNK_SIZE = 3
 BLOCK_SIZE = 10_000
 
 def get_pi_single(runs):
+    """
+    Simulates Pi using the most inefficient method possible.
+    """
     inside_circle = 0
     outside_circle = 0
 
@@ -37,6 +44,9 @@ def get_pi_single(runs):
 
 # Using Numpy for vectorized operations is much faster
 def get_inside_circle(runs):
+    """
+    Uses arrays to simulate pi
+    """
     x = np.random.rand(runs)
     y = np.random.rand(runs)
     inside_circle = np.sum(x*x + y*y <= 1)
@@ -44,14 +54,15 @@ def get_inside_circle(runs):
     return inside_circle
 
 def get_inside_circle_blocked(runs, block_size = BLOCK_SIZE):
+    """
+    Uses arrays in blocks to simulate pi, which reduces memory usage.
+    """
     inside_circle = 0
     for start in range(0, runs, block_size):
         size = min(block_size, runs - start)
         x = np.random.rand(size)
         y = np.random.rand(size)
         inside_circle += np.sum(x**2 + y**2 <= 1)
-    return inside_circle
-
     return inside_circle
 
 def get_split_runs(total_runs, cpu_count):
@@ -68,9 +79,10 @@ def get_split_runs(total_runs, cpu_count):
     return runs_per_process
 
 def simulate_pi(runs):
+    """
+    Simulates pi using multiprocessing.
+    """
     print(f"Number of runs:       {runs}")
-
-    # pi_estimate = get_pi_vectorized(runs)
 
     cpu_count = os.process_cpu_count()
     runs_per_process = get_split_runs(runs, cpu_count)

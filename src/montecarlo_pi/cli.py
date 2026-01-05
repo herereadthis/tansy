@@ -1,3 +1,7 @@
+"""
+Main CLI for Monte Carlo π Simulation
+"""
+
 import sys
 import time
 from montecarlo_pi.simulation.pi_simulation import simulate_pi
@@ -8,6 +12,9 @@ DEFAULT_RUNS = 10_000_000_000
 
 
 def main():
+    """
+    main CLI function
+    """
     print("\nMonte Carlo π Simulation\n")
     runs = int(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_RUNS
     start_time = time.time()

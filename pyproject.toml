@@ -9,7 +9,6 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "typer[all] (==0.16.0)",
     "numpy (>=2.4.0,<3.0.0)"
 ]
 
@@ -22,6 +21,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.2"
+pylint = "^4.0.4"
+nox = "^2025.11.12"
 
 [tool.pylint]
 max-line-length = 120

@@ -5,10 +5,17 @@ TESTS = "tests"
 
 @nox.session(python=False)
 def tests(session):
-    """Run pytest on the tests folder."""
-    session.log("=== Running pytest ===")
-    # Use Poetry-managed virtualenv
-    session.run("poetry", "run", "pytest", TESTS, external=True)
+    """Run pytest with coverage."""
+    session.log("=== Running pytest with coverage ===")
+    session.run(
+        "poetry",
+        "run",
+        "pytest",
+        TESTS,
+        "--cov=montecarlo_pi",
+        "--cov-report=term-missing",
+        external=True,
+    )
 
 @nox.session(python=False)
 def lint(session):

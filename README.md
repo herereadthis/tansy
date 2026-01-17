@@ -31,3 +31,45 @@ poetry run nox -s check
 # Run the simulation
 poetry run montecarlo-pi
 ```
+
+### Container
+
+You can run this application locally as a docker container.
+
+```zsh
+# Build
+docker build -t montecarlo-pi .
+
+# Run the container
+docker run --rm -p 5100:5100 montecarlo-pi
+
+# Health check
+curl localhost:5100/health
+```
+
+
+___
+
+## Deprecated notes
+
+### Container
+
+Previously, this project was a CLI tool. The `Dockerfile` had:
+
+```sh
+ENTRYPOINT ["montecarlo-pi"]
+CMD []
+```
+
+To run the CLI:
+
+```zsh
+# Build
+docker build -t montecarlo-pi .
+
+# Run with default
+docker run --rm montecarlo-pi
+
+# Run with arguments
+docker run --rm montecarlo-pi [your-cli-arguments]
+```

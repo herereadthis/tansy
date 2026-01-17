@@ -3,10 +3,14 @@ Simulate pi via Monte Carlo, with multiprocessing.
 """
 
 from decimal import Decimal
+import logging
 from multiprocessing import Pool
 import os
 import random
 import numpy as np
+
+# there is no need to set config here, since it will inherit from the main CLI
+logger = logging.getLogger(__name__)
 
 # Chunk size for multiprocessing
 # This value defines how many tasks are sent to each worker at a time
@@ -69,7 +73,7 @@ def get_split_runs(total_runs, cpu_count):
     """
     Splits the total number of runs into chunks for each CPU core.
     """
-    print(f"cpu count:            {cpu_count}")
+    logger.info(f"cpu count:            {cpu_count}")
     runs_per_process = [total_runs // cpu_count for cpu_index in range(cpu_count)]
     remainder = total_runs % cpu_count
 
@@ -82,11 +86,11 @@ def simulate_pi(runs):
     """
     Simulates pi using multiprocessing.
     """
-    print(f"Number of runs:       {runs}")
+    logger.info(f"Number of runs:       {runs}")
 
     cpu_count = os.process_cpu_count()
     runs_per_process = get_split_runs(runs, cpu_count)
-    print(f"runs per process:     {runs_per_process[0]}")
+    logger.info(f"runs per process:     {runs_per_process[0]}")
 
     # Pool manages multiple processes
     # The following line tells how many processes to spawn

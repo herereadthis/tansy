@@ -2,6 +2,8 @@
 Utility functions
 """
 
+from contextlib import contextmanager
+import time
 from decimal import Decimal
 
 def get_decimal_precision(value):
@@ -35,3 +37,27 @@ def get_accuracy(true_value, estimated_value):
                 break
 
     return decimal_accuracy
+
+def get_readable_time_diff(start_time, end_time):
+    """
+    Returns a human-readable time difference between two timestamps.
+    """
+    elapsed_time = end_time - start_time
+
+    if elapsed_time < 60:
+        return f"{elapsed_time:.3f} seconds"
+    else:
+        return f"{elapsed_time / 60:.3f} minutes"
+
+@contextmanager
+def timer():
+    """
+    Use context manager to measure time.
+    see https://docs.python.org/3/library/contextlib.html#examples-and-recipes
+    """
+    start = time.perf_counter()
+    elapsed = {}
+    try:
+        yield elapsed
+    finally:
+        elapsed['seconds'] = time.perf_counter() - start

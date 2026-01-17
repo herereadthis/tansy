@@ -2,3 +2,10 @@
 .coverage
 .coverage.*
 htmlcov/
+
+
+__pycache__/
+.pytest_cache/
+.nox
+dist/
+build/

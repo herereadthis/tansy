@@ -40,7 +40,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Application Environment Variables
-ENV DEFAULT_RUNS=1000000
+ENV DEFAULT_RUNS=10000000
 
 # Create non-root user
 RUN groupadd --gid 1000 appuser && \

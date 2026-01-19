@@ -91,6 +91,8 @@ def simulate_pi(runs):
     cpu_count = os.process_cpu_count()
     runs_per_process = get_split_runs(runs, cpu_count)
     logger.info(f"runs per process:     {runs_per_process[0]}")
+    # Uncomment to test error handling
+    # foo = 0 / 0
 
     # Pool manages multiple processes
     # The following line tells how many processes to spawn

@@ -28,3 +28,8 @@ def check(session):
     """Run tests and lint sequentially; fail if either fails."""
     session.notify("tests")
     session.notify("lint")
+
+@nox.session
+def dev(session):
+    """Run local FastAPI development server"""
+    session.run("uvicorn", "montecarlo_pi.api.main:app", "--port", "5101", "--reload")

@@ -5,8 +5,7 @@ Main CLI for Monte Carlo π Simulation
 import argparse
 import os
 import logging
-from montecarlo_pi.simulation.pi_simulation import simulate_pi
-from montecarlo_pi.simulation.chudnovsky import compute_pi
+from montecarlo_pi.simulation.service import run_simulation
 import montecarlo_pi.utilities.util as util
 
 DEFAULT_RUNS = int(os.getenv('DEFAULT_RUNS', '1000000000'))
@@ -30,36 +29,17 @@ def main():
     parser.add_argument('runs',type=int, nargs='?', default=DEFAULT_RUNS, help=help_text)
     args = parser.parse_args()
 
-    with util.timer() as t:
-        pi_estimate = simulate_pi(args.runs)
+    result = run_simulation(args.runs)
+    readable_time = util.get_readable_time_diff(0, result['elapsed_seconds'])
 
-    pi_precision = util.get_decimal_precision(pi_estimate)
-    computed_pi = compute_pi(pi_precision)
-    accuracy = util.get_accuracy(computed_pi, pi_estimate)
-    readable_time = util.get_readable_time_diff(0, t['seconds'])
-
-    logger.info(f"Estimated value of π: {pi_estimate}")
-    logger.info(f"Chudnovsky π value:   {computed_pi}")
-    logger.info(f"Accuracy:             {accuracy} decimal {format('place' if accuracy == 1 else 'places')}")
-    logger.info(f"Time elapsed:         {readable_time}")
+    logger.info("Estimated value of π: %s", result['pi_estimate'])
+    logger.info("Chudnovsky π value: %s", result['chudnovsky_pi'])
+    logger.info(
+        "Accuracy:             %s decimal %s",
+        result['accuracy'],
+        'place' if result['accuracy'] == 1 else 'places'
+    )
+    logger.info("Time elapsed: %s", readable_time)
     logger.info("\n")
 
-    return pi_estimate
-
-"""
-Future work, signal handling
-
-import signal
-import sys
-
-def signal_handler(signum, frame):
-    print("Received signal, shutting down gracefully...")
-    sys.exit(0)
-
-def main():
-    # Register signal handlers for graceful shutdown
-    signal.signal(signal.SIGTERM, signal_handler)  # K8s sends SIGTERM
-    signal.signal(signal.SIGINT, signal_handler)   # Ctrl+C
-    
-# ... rest of your argparse code
-"""
+    return result['pi_estimate']

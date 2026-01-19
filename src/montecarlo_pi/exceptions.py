@@ -1,0 +1,2 @@
+class SimulationError(RuntimeError):
+    pass

@@ -4,7 +4,10 @@ Utility functions
 
 from contextlib import contextmanager
 import time
+import logging
 from decimal import Decimal
+
+logger = logging.getLogger(__name__)
 
 def get_decimal_precision(value):
     """
@@ -26,16 +29,16 @@ def get_accuracy(true_value, estimated_value):
 
     true_value_decimals = str(true_value_decimal).split(".")[1] if "." in str(true_value_decimal) else ""
     estimated_value_decimals = str(estimated_value_decimal).split(".")[1] if "." in str(estimated_value_decimal) else ""
+    max_decimal_places = max(len(true_value_decimals), len(estimated_value_decimals))
 
-    decimal_accuracy = 0
+    decimal_accuracy = max_decimal_places
+    for decimal_places in range(max_decimal_places + 1):
+        true_rounded = round(true_value_decimal, decimal_places)
+        estimated_rounded = round(estimated_value_decimal, decimal_places)
 
-    if len(true_value_decimals) != 0 and len(estimated_value_decimals) != 0:
-        for true_decimal_digit, estimated_decimal_digit in zip(true_value_decimals, estimated_value_decimals):
-            if true_decimal_digit == estimated_decimal_digit:
-                decimal_accuracy += 1
-            else:
-                break
-
+        if true_rounded != estimated_rounded:
+            decimal_accuracy = max(0, decimal_places - 1)
+            break
     return decimal_accuracy
 
 def get_readable_time_diff(start_time, end_time):
@@ -45,9 +48,11 @@ def get_readable_time_diff(start_time, end_time):
     elapsed_time = end_time - start_time
 
     if elapsed_time < 60:
-        return f"{elapsed_time:.3f} seconds"
+        time_diff = f"{elapsed_time:.3f} seconds"
     else:
-        return f"{elapsed_time / 60:.3f} minutes"
+        time_diff = f"{elapsed_time / 60:.3f} minutes"
+
+    return time_diff
 
 @contextmanager
 def timer():

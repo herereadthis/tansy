@@ -6,7 +6,7 @@ import argparse
 import os
 import logging
 from montecarlo_pi.simulation.service import run_simulation
-import montecarlo_pi.utilities.util as util
+from montecarlo_pi.utilities import util
 
 DEFAULT_RUNS = int(os.getenv('DEFAULT_RUNS', '1000000000'))
 

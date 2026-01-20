@@ -96,6 +96,7 @@ tansy/                              # Root directory
 │
 └── tests/                          # Test suite
     ├── test_boilerplate.py         # Setup validation tests
+    ├── test_api.py                 # Test module for endpoints
     ├── test_pi_simulation.py       # Test module for business logic
     └── test_util.py                # Test module for utilities
 ```

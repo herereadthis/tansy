@@ -14,7 +14,7 @@ def run_simulation(sample_size):
     """
     if sample_size <= 0:
         raise ValueError("Sample size must be a positive integer")
-    
+
     try:
         with util.timer() as t:
             pi_estimate = simulate_pi(sample_size)
@@ -25,9 +25,11 @@ def run_simulation(sample_size):
     # computed_pi = compute_pi(pi_precision)
     computed_pi = round(constants.PI, pi_precision)
     accuracy = util.get_accuracy(computed_pi, pi_estimate)
+    pi_rounded = round(pi_estimate, accuracy)
 
     return {
         'pi_estimate': pi_estimate,
+        'pi_rounded': pi_rounded,
         'sample_size': sample_size,
         # 'chudnovsky_pi=computed_pi,
         'pi': computed_pi,

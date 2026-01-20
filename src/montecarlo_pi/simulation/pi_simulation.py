@@ -73,7 +73,7 @@ def get_split_runs(total_runs, cpu_count):
     """
     Splits the total number of runs into chunks for each CPU core.
     """
-    logger.info(f"cpu count:            {cpu_count}")
+    logger.info("CPU count:            %s", cpu_count)
     runs_per_process = [total_runs // cpu_count for cpu_index in range(cpu_count)]
     remainder = total_runs % cpu_count
 
@@ -86,11 +86,11 @@ def simulate_pi(runs):
     """
     Simulates pi using multiprocessing.
     """
-    logger.info(f"Number of runs:       {runs}")
+    logger.info("Number of runs:       %s", runs)
 
     cpu_count = os.process_cpu_count()
     runs_per_process = get_split_runs(runs, cpu_count)
-    logger.info(f"runs per process:     {runs_per_process[0]}")
+    logger.info("Runs per process:     %s", runs_per_process[0])
     # Uncomment to test error handling
     # foo = 0 / 0
 

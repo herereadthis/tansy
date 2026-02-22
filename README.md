@@ -49,9 +49,9 @@ docker run --rm -p 5100:5100 montecarlo-pi
 # Health check
 curl localhost:5100/health
 # simulate pi
-curl http://localhost:5101/simulate/pi
+curl http://localhost:5100/simulate/pi
 # simulate pi, specify simulations
-curl http://localhost:5101/simulate/pi?sample_size=100000&pretty=true
+curl http://localhost:5100/simulate/pi?sample_size=100000&pretty=true
 ```
 
 ### Application structure

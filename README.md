@@ -43,7 +43,8 @@ You can run this application locally as a docker container.
 
 ```zsh
 # Build
-docker build -t montecarlo-pi .
+# When testing, you don't want to build from a working cache, so use --no-cache
+docker build --no-cache -t montecarlo-pi .
 # Run the container
 docker run --rm -p 5100:5100 montecarlo-pi
 # Health check
@@ -52,6 +53,14 @@ curl localhost:5100/health
 curl http://localhost:5100/simulate/pi
 # simulate pi, specify simulations
 curl http://localhost:5100/simulate/pi?sample_size=100000&pretty=true
+```
+
+#### Pulling the image
+
+```zsh
+docker pull ghcr.io/herereadthis/tansy:latest
+docker run --rm -p 5100:5100 ghcr.io/herereadthis/tansy:latest
+curl localhost:5100/health
 ```
 
 ### Application structure

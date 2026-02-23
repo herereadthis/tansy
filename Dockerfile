@@ -1,6 +1,8 @@
 # Official Python runtime is base image
 # builder is for multi-stage build to install dependencies
-FROM python:3.13-slim AS builder
+ARG PYTHON_VERSION=3.14
+FROM python:${PYTHON_VERSION}-slim AS builder
+ARG PYTHON_VERSION
 
 # environment Variables ========================================================
 # Reference: https://docs.python.org/3/using/cmdline.html#environment-variables
@@ -23,17 +25,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create and set working directory
 WORKDIR /app
 
-# Copy dependency files
-COPY pyproject.toml README.md ./
+# Install Poetry
+RUN pip install poetry
+
+COPY pyproject.toml poetry.lock README.md ./
 COPY src/ ./src/
 
-# Install Python dependencies
-RUN pip install --upgrade pip && \
-    pip install .
+# Install dependencies from lockfile
+RUN poetry config virtualenvs.create false && poetry install --only main
+
 
 # Production stage. For multi-stage builds, see:
 # https://testdriven.io/blog/docker-best-practices/#use-multi-stage-builds
-FROM python:3.13-slim AS production
+FROM python:${PYTHON_VERSION}-slim AS production
+ARG PYTHON_VERSION
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -50,12 +55,8 @@ RUN groupadd --gid 1000 appuser && \
 WORKDIR /app
 
 # Copy installed packages from builder stage
-COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /usr/local/lib/python${PYTHON_VERSION}/site-packages /usr/local/lib/python${PYTHON_VERSION}/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
-
-# Copy application source code
-# COPY --chown=appuser:appuser src/ ./src/
-# COPY --chown=appuser:appuser pyproject.toml README.md ./
 
 # Switch to non-root user
 USER appuser

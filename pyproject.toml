@@ -9,7 +9,7 @@ license = "MIT"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "numpy (>=2.4.0,<3.0.0)",
+    "numpy (>=2.4.2,<3.0.0)",
     "fastapi[standard] (>=0.128.0,<0.129.0)",
     "uvicorn[standard] (>=0.40.0,<0.41.0)"
 ]

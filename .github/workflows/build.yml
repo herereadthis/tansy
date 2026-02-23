@@ -8,7 +8,7 @@ on:
         description: 'Ref: branch|tag|SHA'
         type: string
         required: false
-        default: build
+        default: main
       push-image:
         description: 'Push image to registry'
         type: boolean
@@ -16,26 +16,28 @@ on:
         default: false
   push:
     branches:
-      - main
+      - '*'
     tags:
       - '*'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Get ref
         id: ref
         run: |
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "branch" ]]; then
-            echo "ref=main" >> $GITHUB_OUTPUT
-            echo "docker-tag=latest" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "ref=${{ github.event.inputs.ref }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "branch" ]]; then
+            echo "ref=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
             echo "ref=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "docker-tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-          else 
-            echo "ref=${{ github.event.inputs.ref }}" >> $GITHUB_OUTPUT
-            echo "docker-tag=${{ github.sha }}" >> $GITHUB_OUTPUT
           fi
       - name: Checkout code
         uses: actions/checkout@v6
@@ -69,46 +71,49 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: options
         id: options
+        env:
+          BASE_TAG: ghcr.io/${{ github.repository }}
         run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            DOCKER_TAGS=${{ steps.docker-meta.outputs.tags }}
+            PUSH_IMAGE=${{ github.event.inputs.push-image }}
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
+            DOCKER_TAGS=${{ env.BASE_TAG }}:${{ github.ref_name }}
+            PUSH_IMAGE=true
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "branch" \
+            && "${{ github.ref_name }}" == 'main' ]]; then
+            DOCKER_TAGS=${{ env.BASE_TAG }}:latest
+            PUSH_IMAGE=true
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "branch" \
+            && "${{ github.ref_name }}" != 'main' ]]; then
+            DOCKER_TAGS=${{ env.BASE_TAG }}:${{ github.ref_name }}
+            PUSH_IMAGE=false
+          fi
+          echo "docker-tags=${DOCKER_TAGS}" >> $GITHUB_OUTPUT
+          echo "push-image=${PUSH_IMAGE}" >> $GITHUB_OUTPUT
           echo "ref=${{ steps.ref.outputs.ref }}" >> $GITHUB_OUTPUT
           echo "python-version=${{ steps.setup-python.outputs.python-version }}" >> $GITHUB_OUTPUT
           echo "build-number=${{ github.run_number }}" >> $GITHUB_OUTPUT
           echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Manual Build and push
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          push: ${{ github.event.inputs.push-image }}
-          tags: ${{ steps.docker-meta.outputs.tags }}
-          labels: ${{ steps.docker-meta.outputs.labels }}
-      - name: Build and push tag
-        if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
-          labels: ${{ steps.docker-meta.outputs.labels }}
-      - name: Build and push main
-        if: ${{ github.event_name == 'push' && github.ref_type == 'branch' }}
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+          push: ${{ steps.options.outputs.push-image }}
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.options.outputs.docker-tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
       - name: step summary
         uses: actions/github-script@v7
         with:
           script: |
+            const name = 'docker/metadata-action';
             const json = {
               options: ${{ toJSON(steps.options.outputs) }},
               meta: ${{ toJSON(steps.docker-meta.outputs) }}
             };
-            const name = 'docker/metadata-action';
-            if (name !== '') {
-              core.summary.addHeading(name, 3);
-            }
+            core.summary.addHeading(name, 3);
             core.summary.addCodeBlock(JSON.stringify(json, null, 4), 'json');
             core.summary.addEOL();
             core.summary.write();

@@ -29,7 +29,7 @@ def test_identical_numbers():
 
 def test_partial_match():
     """test numbers with partial decimal match"""
-    assert get_accuracy(3.14159, 3.14129) == 3
+    assert get_accuracy(3.1415926, 3.1419) == 3
 
 
 def test_total_mismatch():

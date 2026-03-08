@@ -16,6 +16,9 @@ poetry install
 
 ## Testing
 
+* This project uses `nox` to do repetitive tasks that would otherwise be easy to forget.
+* See `/noxfile.py` for all tasks 
+
 ```zsh
 # run pytest
 poetry run nox -s tests
@@ -25,7 +28,10 @@ poetry run nox -s lint
 poetry run nox -s check
 ```
 
-## Usage
+## Local testing and development
+
+* Note that for local development, the FastAPI server runs on port `5101`.
+* This port is different than the `5100` port for the Docker image, in order avoid collisions.
 
 ```zsh
 # Test on local env on port 5101
@@ -37,7 +43,7 @@ curl http://localhost:5101/health
 poetry run montecarlo-pi
 ```
 
-### Container
+## Container
 
 You can run this application locally as a docker container.
 
@@ -63,7 +69,13 @@ docker run --rm -p 5100:5100 ghcr.io/herereadthis/tansy:latest
 curl localhost:5100/health
 ```
 
-### Application structure
+## Future planned work
+
+This project is an "embarrassingly parallel" workdload
+
+
+
+## Application structure
 
 
 ```
@@ -74,6 +86,14 @@ tansy/                              # Root directory
 ├── noxfile.py                      # Task automation config via Nox
 ├── poetry.lock                     # Poetry dependency lock file 
 ├── pyproject.toml                  # Project config, metadata, dependencies
+├── .github/                        # GitHub Actions workflows
+│   └── workflows/
+│       └── build.yml               # CI/CD pipeline
+├── .vscode/                        # VS Code workspace settings
+│   ├── extensions.json             # Recommended extensions
+│   └── settings.json               # Workspace settings
+├── docs/                           # Documentation
+│   └── dockerfile.md               # Dockerfile documentation
 │
 ├── scripts/                        # Utility scripts
 │   └── test_and_lint.py            # QA automation
@@ -85,7 +105,7 @@ tansy/                              # Root directory
 │       ├── exceptions.py           # Custom exception classes
 │       │
 │       ├── api/                    # HTTP interface layer (FastAPI REST API)
-│       │   ├── __init__.py         Package marker
+│       │   ├── __init__.py         # Package marker
 │       │   ├── main.py             # Interface Module (FastAPI app instance)
 │       │   └── routers/            # API route modules
 │       │       ├── __init__.py     # Package marker
@@ -109,6 +129,16 @@ tansy/                              # Root directory
     ├── test_pi_simulation.py       # Test module for business logic
     └── test_util.py                # Test module for utilities
 ```
+
+___
+
+## Layered Architecture
+
+This application aims to use well-documented patterns of software architecture. When you make a request, the app goes to the router, then service, and then the computation, which is what runs the Monte Carlo simulation. The reasoning is separation of concerns:
+
+1. The router layer (`simulation.py`) does not contain business logic. By containing the router, we can remove FastAPI and replace with something else (or even use a CLI), without having to change the orchestration code.
+2. The service layer (`service.py`) does not have any computation, so we can swap out the current simulation with some other simulation (there are multiple ways to simulate &pi;), without having to alter the business logic.
+3. The computation layer (`pi_simulation.py`) is isolated from business logic, so it will be easy to write unit tests. Compared to popular texts on layered architecture, the computation layer replaces the Data Access layer because there's no persistent state.
 
 
 ___
